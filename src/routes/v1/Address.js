@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const addresses_1 = require("../../controllers/addresses");
+const middlewares_1 = require("../../middlewares");
+const AddressRoute = (0, express_1.Router)();
+AddressRoute.use(middlewares_1.MiddleWares.authorization);
+AddressRoute.get('/', addresses_1.AddressController.find);
+AddressRoute.post('/', addresses_1.AddressController.create);
+AddressRoute.delete('/', addresses_1.AddressController.remove);
+exports.default = AddressRoute;

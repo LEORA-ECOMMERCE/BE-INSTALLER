@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const middlewares_1 = require("../../middlewares");
+const products_1 = require("../../controllers/products");
+const ProductRoute = (0, express_1.Router)();
+ProductRoute.get('/', products_1.ProductController.findAll);
+ProductRoute.get('/detail/:productId', products_1.ProductController.findOne);
+ProductRoute.post('/', middlewares_1.MiddleWares.authorization, products_1.ProductController.create);
+ProductRoute.patch('/', middlewares_1.MiddleWares.authorization, products_1.ProductController.update);
+ProductRoute.delete('/', middlewares_1.MiddleWares.authorization, products_1.ProductController.remove);
+ProductRoute.post('/upload-excel', products_1.ProductController.upload);
+ProductRoute.get('/upload-histories', products_1.ProductController.uploadHistories);
+exports.default = ProductRoute;

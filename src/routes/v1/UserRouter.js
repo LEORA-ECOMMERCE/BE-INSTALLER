@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const middlewares_1 = require("../../middlewares");
+const users_1 = require("../../controllers/users");
+const UserRoute = (0, express_1.Router)();
+UserRoute.get('/', middlewares_1.MiddleWares.authorization, users_1.UsersController.findAll);
+UserRoute.get('/detail/:userId', middlewares_1.MiddleWares.authorization, users_1.UsersController.findDetailUser);
+UserRoute.post('/login', users_1.UsersController.login);
+UserRoute.post('/register', users_1.UsersController.register);
+UserRoute.patch('/', middlewares_1.MiddleWares.authorization, users_1.UsersController.update);
+UserRoute.delete('/', middlewares_1.MiddleWares.authorization, users_1.UsersController.remove);
+UserRoute.patch('/update-coin', middlewares_1.MiddleWares.authorization, users_1.UsersController.updateUserCoin);
+UserRoute.patch('/update-password', users_1.UsersController.updatePassword);
+UserRoute.post('/otp/request', users_1.UsersController.requestOtp);
+UserRoute.post('/otp/verify', users_1.UsersController.verifyOtp);
+exports.default = UserRoute;

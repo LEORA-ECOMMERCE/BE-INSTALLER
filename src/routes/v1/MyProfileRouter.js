@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const middlewares_1 = require("../../middlewares");
+const myProfile_1 = require("../../controllers/myProfile");
+const MyProfileRoute = (0, express_1.Router)();
+MyProfileRoute.use(middlewares_1.MiddleWares.authorization);
+MyProfileRoute.get('/', myProfile_1.MyProfileController.find);
+MyProfileRoute.patch('/', myProfile_1.MyProfileController.update);
+exports.default = MyProfileRoute;

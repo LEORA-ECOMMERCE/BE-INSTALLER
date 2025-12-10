@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const middlewares_1 = require("../../middlewares");
+const waBlass_1 = require("../../controllers/waBlass");
+const WablasRoute = (0, express_1.Router)();
+WablasRoute.use(middlewares_1.MiddleWares.authorization);
+WablasRoute.post('/send-message', waBlass_1.WaBlasController.send);
+WablasRoute.get('/history', waBlass_1.WaBlasController.findAllHistory);
+WablasRoute.get('/history/detail/:waBlasHistoryId', waBlass_1.WaBlasController.findDetailHistory);
+WablasRoute.delete('/', waBlass_1.WaBlasController.removeWablasHistory);
+exports.default = WablasRoute;

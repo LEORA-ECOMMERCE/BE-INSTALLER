@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const middlewares_1 = require("../../middlewares");
+const transactions_1 = require("../../controllers/transactions");
+const TransactionRoute = (0, express_1.Router)();
+TransactionRoute.use(middlewares_1.MiddleWares.authorization);
+TransactionRoute.get('/', transactions_1.TransactionController.findAll);
+TransactionRoute.get('/detail/:transactionId', transactions_1.TransactionController.findOne);
+TransactionRoute.post('/', transactions_1.TransactionController.create);
+TransactionRoute.patch('/', transactions_1.TransactionController.update);
+TransactionRoute.delete('/', transactions_1.TransactionController.remove);
+exports.default = TransactionRoute;

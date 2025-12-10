@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const middlewares_1 = require("../../middlewares");
+const settings_1 = require("../../controllers/settings");
+const SettingRoute = (0, express_1.Router)();
+SettingRoute.get('/', settings_1.SettingsController.findSetting);
+SettingRoute.post('/', middlewares_1.MiddleWares.authorization, settings_1.SettingsController.createSetting);
+SettingRoute.patch('/', middlewares_1.MiddleWares.authorization, settings_1.SettingsController.updateSetting);
+SettingRoute.delete('/:settingId', middlewares_1.MiddleWares.authorization, settings_1.SettingsController.removeSetting);
+exports.default = SettingRoute;

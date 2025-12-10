@@ -1,0 +1,36 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const logs_1 = __importDefault(require("../../logs"));
+const http_status_codes_1 = require("http-status-codes");
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
+const registry_1 = __importDefault(require("./registry"));
+const swagger_1 = require("../../configs/swagger");
+const response_1 = require("../../utilities/response");
+const routers = (0, express_1.Router)();
+routers.use('/api/v1/', registry_1.default.HealthRoute);
+routers.use('/api/v1/addresses', registry_1.default.AddressRoute);
+routers.use('/api/v1/admins', registry_1.default.AdminRoute);
+routers.use('/api/v1/carts', registry_1.default.CartRoute);
+routers.use('/api/v1/categories', registry_1.default.CategoryRoute);
+routers.use('/api/v1/my-profiles', registry_1.default.MyProfileRoute);
+routers.use('/api/v1/notifications', registry_1.default.NotificationRoute);
+routers.use('/api/v1/orders', registry_1.default.OrderRoute);
+routers.use('/api/v1/products', registry_1.default.ProductRoute);
+routers.use('/api/v1/settings', registry_1.default.SettingRoute);
+routers.use('/api/v1/statistic', registry_1.default.StatisticRoute);
+routers.use('/api/v1/transactions', registry_1.default.TransactionRoute);
+routers.use('/api/v1/users', registry_1.default.UserRoute);
+routers.use('/api/v1/wa-blas', registry_1.default.WablasRoute);
+routers.use('/api/v1/payment-methods', registry_1.default.PaymentMethodRouter);
+routers.use('/docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.swaggerSpec));
+routers.use((req, res) => {
+    const message = `Route not found!`;
+    logs_1.default.warn(message);
+    const response = response_1.ResponseData.error({ message });
+    return res.status(http_status_codes_1.StatusCodes.NOT_FOUND).json(response);
+});
+exports.default = routers;
