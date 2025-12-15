@@ -40,6 +40,22 @@ exports.OrdersModel = _1.sequelize.define('orders', {
         type: sequelize_1.DataTypes.NUMBER,
         allowNull: false
     },
+    orderCourierCode: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true
+    },
+    orderCourierService: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true
+    },
+    orderTrackingId: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true
+    },
+    orderWaybillId: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true
+    },
     orderStatus: {
         type: sequelize_1.DataTypes.ENUM('waiting', 'process', 'delivery', 'done', 'cancel'),
         allowNull: false,

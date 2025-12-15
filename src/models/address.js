@@ -45,6 +45,10 @@ exports.AddressesModel = _1.sequelize.define('addresses', {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false
     },
+    addressDesa: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false
+    },
     addressCategory: {
         type: sequelize_1.DataTypes.ENUM('user', 'admin'),
         allowNull: false,

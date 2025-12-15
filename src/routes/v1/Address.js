@@ -8,4 +8,8 @@ AddressRoute.use(middlewares_1.MiddleWares.authorization);
 AddressRoute.get('/', addresses_1.AddressController.find);
 AddressRoute.post('/', addresses_1.AddressController.create);
 AddressRoute.delete('/', addresses_1.AddressController.remove);
+AddressRoute.get('/provinces', addresses_1.AddressController.findProvinces);
+AddressRoute.get('/regencies/:provinceId', addresses_1.AddressController.findRegencies);
+AddressRoute.get('/districts/:regencyId', addresses_1.AddressController.findDistricts);
+AddressRoute.get('/villages/:districtId', addresses_1.AddressController.findVillages);
 exports.default = AddressRoute;

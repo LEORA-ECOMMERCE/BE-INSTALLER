@@ -16,7 +16,8 @@ const createAddress = async (req, res) => {
             'addressPostalCode',
             'addressProvinsi',
             'addressKabupaten',
-            'addressKecamatan'
+            'addressKecamatan',
+            'addressDesa'
         ],
         requestData: requestBody
     });
@@ -47,6 +48,7 @@ const createAddress = async (req, res) => {
                 addressProvinsi: requestBody.addressProvinsi,
                 addressKabupaten: requestBody.addressKabupaten,
                 addressKecamatan: requestBody.addressKecamatan,
+                addressDesa: requestBody.addressDesa,
                 addressCategory
             }, { where: { addressUserId: userId } });
             result = { message: 'Address updated successfully' };
@@ -61,6 +63,7 @@ const createAddress = async (req, res) => {
                 addressProvinsi: requestBody.addressProvinsi,
                 addressKabupaten: requestBody.addressKabupaten,
                 addressKecamatan: requestBody.addressKecamatan,
+                addressDesa: requestBody.addressDesa,
                 addressCategory
             };
             await address_1.AddressesModel.create(newAddress);

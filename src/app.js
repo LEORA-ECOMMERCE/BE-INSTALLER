@@ -6,12 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const helmet_1 = __importDefault(require("helmet"));
+// import helmet from 'helmet'
 const compression_1 = __importDefault(require("compression"));
 const v1_1 = __importDefault(require("./routes/v1"));
 const middlewares_1 = require("./middlewares");
 const app = (0, express_1.default)();
-app.use((0, helmet_1.default)());
+// app.use(helmet())
 app.use(middlewares_1.MiddleWares.corsOrigin());
 // app.use(MiddleWares.limiter())
 app.use(middlewares_1.MiddleWares.loggerMidleWare());

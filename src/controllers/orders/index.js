@@ -10,5 +10,5 @@ exports.OrderController = {
     findAll: find_1.findAllOrder,
     findOne: find_1.findDetailOrder,
     remove: remove_1.removeOrder,
-    update: update_1.updateOrder
+    update: update_1.updateOrder,
 };
