@@ -3,4 +3,3 @@ build
 .env
 tmp
 public/*
-src/logs/*
