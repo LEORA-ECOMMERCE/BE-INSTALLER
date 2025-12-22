@@ -3,36 +3,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAddress = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const response_1 = require("../../utilities/response");
-const requestCheker_1 = require("../../utilities/requestCheker");
 const address_1 = require("../../models/address");
 const requestHandler_1 = require("../../utilities/requestHandler");
+const addressSchema_1 = require("../../validations/addressSchema");
 const createAddress = async (req, res) => {
-    const requestBody = req.body;
-    const emptyField = (0, requestCheker_1.requestChecker)({
-        requireList: [
-            'addressUserName',
-            'addressKontak',
-            'addressDetail',
-            'addressPostalCode',
-            'addressProvinsi',
-            'addressKabupaten',
-            'addressKecamatan',
-            'addressDesa'
-        ],
-        requestData: requestBody
-    });
-    if (emptyField.length > 0) {
-        const message = `invalid request parameter! require (${emptyField})`;
-        const response = response_1.ResponseData.error(message);
-        return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json(response);
-    }
+    const { error: validationError, value: validatedData } = (0, requestHandler_1.validateRequest)(addressSchema_1.createAddressSchema, req.body);
+    if (validationError)
+        return (0, requestHandler_1.handleValidationError)(res, validationError);
     try {
-        const userId = req.body?.user?.userId;
+        const userId = req.jwtPayload?.userId;
         if (!userId) {
             const response = response_1.ResponseData.error('User ID not found in request');
             return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json(response);
         }
-        const addressCategory = req.body?.user?.userRole === 'admin' || req.body?.user?.userRole === 'superAdmin'
+        const addressCategory = validatedData?.user?.userRole === 'admin' ||
+            validatedData?.user?.userRole === 'superAdmin'
             ? 'admin'
             : 'user';
         const existingAddress = await address_1.AddressesModel.findOne({
@@ -41,14 +26,16 @@ const createAddress = async (req, res) => {
         let result;
         if (existingAddress) {
             await address_1.AddressesModel.update({
-                addressUserName: requestBody.addressUserName,
-                addressKontak: requestBody.addressKontak,
-                addressDetail: requestBody.addressDetail,
-                addressPostalCode: requestBody.addressPostalCode,
-                addressProvinsi: requestBody.addressProvinsi,
-                addressKabupaten: requestBody.addressKabupaten,
-                addressKecamatan: requestBody.addressKecamatan,
-                addressDesa: requestBody.addressDesa,
+                addressUserName: validatedData.addressUserName,
+                addressKontak: validatedData.addressKontak,
+                addressDetail: validatedData.addressDetail,
+                addressPostalCode: validatedData.addressPostalCode,
+                addressProvinsi: validatedData.addressProvinsi,
+                addressKabupaten: validatedData.addressKabupaten,
+                addressKecamatan: validatedData.addressKecamatan,
+                addressDesa: validatedData.addressDesa,
+                addressLatitude: validatedData.addressLatitude,
+                addressLongitude: validatedData.addressLongitude,
                 addressCategory
             }, { where: { addressUserId: userId } });
             result = { message: 'Address updated successfully' };
@@ -56,14 +43,16 @@ const createAddress = async (req, res) => {
         else {
             const newAddress = {
                 addressUserId: userId,
-                addressUserName: requestBody.addressUserName,
-                addressKontak: requestBody.addressKontak,
-                addressDetail: requestBody.addressDetail,
-                addressPostalCode: requestBody.addressPostalCode,
-                addressProvinsi: requestBody.addressProvinsi,
-                addressKabupaten: requestBody.addressKabupaten,
-                addressKecamatan: requestBody.addressKecamatan,
-                addressDesa: requestBody.addressDesa,
+                addressUserName: validatedData.addressUserName,
+                addressKontak: validatedData.addressKontak,
+                addressDetail: validatedData.addressDetail,
+                addressPostalCode: validatedData.addressPostalCode,
+                addressProvinsi: validatedData.addressProvinsi,
+                addressKabupaten: validatedData.addressKabupaten,
+                addressKecamatan: validatedData.addressKecamatan,
+                addressDesa: validatedData.addressDesa,
+                addressLatitude: validatedData.addressLatitude,
+                addressLongitude: validatedData.addressLongitude,
                 addressCategory
             };
             await address_1.AddressesModel.create(newAddress);

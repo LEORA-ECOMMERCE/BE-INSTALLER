@@ -6,4 +6,7 @@ const shipping_1 = require("../../controllers/shipping");
 const ShippingRoute = (0, express_1.Router)();
 ShippingRoute.use(middlewares_1.MiddleWares.authorization);
 ShippingRoute.post('/rates', shipping_1.ShippingController.getShippingRates);
+ShippingRoute.post('/draft', shipping_1.ShippingController.createShippingDraft);
+ShippingRoute.post('/draft/confirm', shipping_1.ShippingController.confirmDraftOrder);
+ShippingRoute.get('/tracking', shipping_1.ShippingController.trackShipment);
 exports.default = ShippingRoute;

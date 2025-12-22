@@ -3,10 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const app_1 = __importDefault(require("./app"));
-const configs_1 = require("./configs");
-const logs_1 = __importDefault(require("./logs"));
-require("./worker/productFileWorker");
+const app_1 = __importDefault(require("./src/app"));
+const configs_1 = require("./src/configs");
+const logs_1 = __importDefault(require("./src/logs"));
+require("./src/worker/productFileWorker");
 const PORT = configs_1.appConfigs.app.port || 8000;
 const server = app_1.default.listen(PORT, () => {
     logs_1.default.info(`Server running on http://localhost:${PORT}`);

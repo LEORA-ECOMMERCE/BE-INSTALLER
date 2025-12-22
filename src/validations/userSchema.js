@@ -7,7 +7,7 @@ exports.verifyOtpSchema = exports.requestOtpSchema = exports.userUpdatePasswordS
 const joi_1 = __importDefault(require("joi"));
 const jwtPayloadSchema_1 = require("./jwtPayloadSchema");
 exports.userSchema = joi_1.default.object({
-    user: jwtPayloadSchema_1.jwtPayloadSchema,
+    jwtPayload: jwtPayloadSchema_1.jwtPayloadSchema,
     userName: joi_1.default.string().required(),
     userEmail: joi_1.default.string().email().required(),
     userPassword: joi_1.default.string().min(6).required(),
@@ -20,7 +20,7 @@ exports.userSchema = joi_1.default.object({
     userPartnerCode: joi_1.default.string().required()
 });
 exports.userUpdateSchema = joi_1.default.object({
-    user: jwtPayloadSchema_1.jwtPayloadSchema,
+    jwtPayload: jwtPayloadSchema_1.jwtPayloadSchema,
     userName: joi_1.default.string().optional(),
     userEmail: joi_1.default.string().email().optional(),
     userPassword: joi_1.default.string().min(6).optional(),

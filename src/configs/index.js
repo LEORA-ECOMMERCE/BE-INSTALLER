@@ -36,6 +36,10 @@ exports.appConfigs = {
         serverKey: process.env.MIDTRANS_SERVER_KEY,
         isProduction: process.env.MIDTRANS_IS_PRODUCTION === 'true'
     },
+    rateLimit: {
+        windowMinutes: process.env.RATE_LIMIT_WINDOW_MINUTES,
+        maxRequest: process.env.RATE_LIMIT_MAX_REQUESTS
+    },
     dataBase: {
         development: {
             username: process.env.DB_USER_NAME,

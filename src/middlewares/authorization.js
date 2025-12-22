@@ -4,6 +4,7 @@ exports.authorization = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const response_1 = require("../utilities/response");
 const jwt_1 = require("../utilities/jwt");
+const requestHandler_1 = require("../utilities/requestHandler");
 const authorization = (req, res, next) => {
     try {
         if (req.headers.authorization == null ||
@@ -19,13 +20,11 @@ const authorization = (req, res, next) => {
             const response = response_1.ResponseData.error(message);
             return res.status(http_status_codes_1.StatusCodes.UNAUTHORIZED).json(response);
         }
-        req.body.user = verify;
+        req.jwtPayload = verify;
         next();
     }
-    catch (error) {
-        const message = `unable to process request! error ${error.message}`;
-        const response = response_1.ResponseData.error(message);
-        return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+    catch (serverError) {
+        return (0, requestHandler_1.handleServerError)(res, serverError);
     }
 };
 exports.authorization = authorization;

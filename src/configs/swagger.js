@@ -11,7 +11,7 @@ const options = {
         info: {
             title: 'Your API',
             version: '1.0.0',
-            description: 'API FRESH DOCUMENTATION'
+            description: 'API LEORA DOCUMENTATION'
         },
         components: {
             securitySchemes: {

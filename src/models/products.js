@@ -30,6 +30,15 @@ exports.ProductModel = _1.sequelize.define('products', {
         type: sequelize_1.DataTypes.DECIMAL,
         allowNull: false
     },
+    productDiscount: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 0
+    },
+    productSellPrice: {
+        type: sequelize_1.DataTypes.DECIMAL,
+        allowNull: true
+    },
     productCategoryId: {
         type: sequelize_1.DataTypes.STRING(100),
         allowNull: true
@@ -55,11 +64,6 @@ exports.ProductModel = _1.sequelize.define('products', {
     productWeight: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: 0
-    },
-    productDiscount: {
-        type: sequelize_1.DataTypes.INTEGER,
-        allowNull: true,
         defaultValue: 0
     }
 }, {

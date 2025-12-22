@@ -22,7 +22,7 @@ const createSetting = async (req, res) => {
         const checkRole = await user_1.UserModel.findOne({
             where: {
                 deleted: { [sequelize_1.Op.eq]: 0 },
-                userId: req.body?.user?.userId,
+                userId: req.jwtPayload?.userId,
                 userRole: { [sequelize_1.Op.eq]: 'superAdmin' }
             }
         });

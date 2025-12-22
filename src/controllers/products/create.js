@@ -3,29 +3,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createProduct = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const response_1 = require("../../utilities/response");
-const requestCheker_1 = require("../../utilities/requestCheker");
 const products_1 = require("../../models/products");
 const requestHandler_1 = require("../../utilities/requestHandler");
+const priceCalculator_1 = require("../../utilities/priceCalculator");
+const productSchema_1 = require("../../validations/productSchema");
 const createProduct = async (req, res) => {
-    const requestBody = req.body;
-    const emptyField = (0, requestCheker_1.requestChecker)({
-        requireList: [
-            'productName',
-            'productDescription',
-            'productImages',
-            'productPrice',
-            'productStock',
-            'productWeight'
-        ],
-        requestData: requestBody
-    });
-    if (emptyField.length > 0) {
-        const message = `invalid request parameter! require (${emptyField})`;
-        const response = response_1.ResponseData.error(message);
-        return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json(response);
-    }
+    const { error: validationError, value: validatedData } = (0, requestHandler_1.validateRequest)(productSchema_1.createProductSchema, req.body);
+    if (validationError)
+        return (0, requestHandler_1.handleValidationError)(res, validationError);
     try {
-        await products_1.ProductModel.create(requestBody);
+        const productSellPrice = (0, priceCalculator_1.calculateSellPrice)({
+            originalPrice: Number(validatedData.productPrice),
+            discountPercent: Number(validatedData.productDiscount)
+        });
+        validatedData.productSellPrice = productSellPrice;
+        await products_1.ProductModel.create(validatedData);
         const response = response_1.ResponseData.default;
         const result = { message: 'success' };
         response.data = result;

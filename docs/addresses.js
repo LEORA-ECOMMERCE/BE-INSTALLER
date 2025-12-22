@@ -19,6 +19,9 @@
  *         - addressProvinsi
  *         - addressKabupaten
  *         - addressKecamatan
+ *         - addressDesa
+ *         - addressLongitude
+ *         - addressLatitude
  *       properties:
  *         addressUserName:
  *           type: string
@@ -41,6 +44,15 @@
  *         addressKecamatan:
  *           type: string
  *           example: "Coblong"
+ *         addressDesa:
+ *           type: string
+ *           example: "Desa"
+ *         addressLongitude:
+ *           type: string
+ *           example: "34324"
+ *         addressLatitude:
+ *           type: string
+ *           example: "42343"
  *     Address:
  *       type: object
  *       required:
@@ -53,7 +65,10 @@
  *         - addressProvinsi
  *         - addressKabupaten
  *         - addressKecamatan
+ *         - addressDesa
  *         - addressCategory
+ *         - addressLongitude
+ *         - addressLatitude
  *       properties:
  *         addressId:
  *           type: string
@@ -82,10 +97,19 @@
  *         addressKecamatan:
  *           type: string
  *           example: "Coblong"
+ *         addressDesa:
+ *           type: string
+ *           example: "42343"
  *         addressCategory:
  *           type: string
  *           enum: [user, admin]
  *           example: "user"
+ *         addressLongitude:
+ *           type: string
+ *           example: "34324"
+ *         addressLatitude:
+ *           type: string
+ *           example: "42343"
  */
 /**
  * @swagger
@@ -230,6 +254,83 @@
  *                   example: Address deleted successfully
  *       404:
  *         description: Address not found
+ *       500:
+ *         description: Server error
+ */
+/**
+ * @swagger
+ * /api/v1/addresses/provinces:
+ *   get:
+ *     summary: Get all provinces
+ *     tags: [ADDRESSES]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of provinces
+ *       500:
+ *         description: Server error
+ */
+/**
+ * @swagger
+ * /api/v1/addresses/regencies/{provinceId}:
+ *   get:
+ *     summary: Get regencies by province ID
+ *     tags: [ADDRESSES]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: provinceId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Province ID
+ *     responses:
+ *       200:
+ *         description: List of regencies
+ *       500:
+ *         description: Server error
+ */
+/**
+ * @swagger
+ * /api/v1/addresses/districts/{regencyId}:
+ *   get:
+ *     summary: Get districts by regency ID
+ *     tags: [ADDRESSES]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: regencyId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Regency ID
+ *     responses:
+ *       200:
+ *         description: List of districts
+ *       500:
+ *         description: Server error
+ */
+/**
+ * @swagger
+ * /api/v1/addresses/villages/{districtId}:
+ *   get:
+ *     summary: Get villages by district ID
+ *     tags: [ADDRESSES]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: districtId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: District ID
+ *     responses:
+ *       200:
+ *         description: List of villages
  *       500:
  *         description: Server error
  */

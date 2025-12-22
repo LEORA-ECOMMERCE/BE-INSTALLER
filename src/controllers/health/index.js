@@ -6,7 +6,7 @@ const response_1 = require("../../utilities/response");
 const mainController = async (req, res) => {
     try {
         const data = {
-            about_me: 'Welcome to LEORA E-COMMERCE API V1'
+            about_me: 'Welcome to LEORA E-COMMERCE API sV1'
         };
         const response = response_1.ResponseData.default;
         response.data = data;

@@ -15,37 +15,57 @@ exports.TransactionsModel = _1.sequelize.define('transactions', {
         primaryKey: true,
         allowNull: false
     },
-    transactionPrice: {
-        type: sequelize_1.DataTypes.INTEGER,
-        allowNull: false
-    },
     transactionOrderId: {
-        type: sequelize_1.DataTypes.STRING,
+        type: sequelize_1.DataTypes.BIGINT,
         allowNull: false
     },
     transactionUserId: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false
     },
+    transactionAmount: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: false
+    },
     transactionOngkirPrice: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false
+    },
+    transactionProvider: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'midtrans'
+    },
+    transactionPaymentType: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true
+    },
+    transactionSnapToken: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true
+    },
+    transactionStatus: {
+        type: sequelize_1.DataTypes.ENUM('pending', 'success', 'failed', 'expire', 'cancel'),
+        allowNull: false,
+        defaultValue: 'pending'
+    },
+    transactionRawResponse: {
+        type: sequelize_1.DataTypes.JSON,
+        allowNull: true
     }
 }, {
-    ..._1.sequelize,
-    timestamps: false,
     tableName: 'transactions',
+    timestamps: false,
     deletedAt: false,
     paranoid: true,
     underscored: true,
     freezeTableName: true,
     engine: 'InnoDB'
 });
-exports.TransactionsModel.hasOne(orders_1.OrdersModel, {
-    sourceKey: 'transactionOrderId',
-    foreignKey: 'orderId'
+/* ================= RELATIONS ================= */
+exports.TransactionsModel.belongsTo(orders_1.OrdersModel, {
+    foreignKey: 'transactionOrderId'
 });
-exports.TransactionsModel.hasOne(user_1.UserModel, {
-    sourceKey: 'transactionUserId',
-    foreignKey: 'userId'
+exports.TransactionsModel.belongsTo(user_1.UserModel, {
+    foreignKey: 'transactionUserId'
 });

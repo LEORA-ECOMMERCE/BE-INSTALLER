@@ -17,7 +17,7 @@ const uploadHistories = async (req, res) => {
                     status: { [sequelize_1.Op.eq]: req.query.status }
                 })
             },
-            order: [['id', 'desc']],
+            order: [['fileId', 'desc']],
             ...(req.query.pagination === 'true' && {
                 limit: page.limit,
                 offset: page.offset

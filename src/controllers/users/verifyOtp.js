@@ -5,13 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyOtp = void 0;
 const http_status_codes_1 = require("http-status-codes");
-const validateRequest_1 = require("../../utilities/validateRequest");
 const response_1 = require("../../utilities/response");
 const redis_1 = __importDefault(require("../../configs/redis"));
 const userSchema_1 = require("../../validations/userSchema");
 const requestHandler_1 = require("../../utilities/requestHandler");
 const verifyOtp = async (req, res) => {
-    const { error, value } = (0, validateRequest_1.validateRequest)(userSchema_1.verifyOtpSchema, req.body);
+    const { error, value } = (0, requestHandler_1.validateRequest)(userSchema_1.verifyOtpSchema, req.body);
     if (error != null) {
         const message = `Invalid request body! ${error.details
             .map((x) => x.message)

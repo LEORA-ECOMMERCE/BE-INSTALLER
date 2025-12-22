@@ -15,11 +15,11 @@ exports.CartsModel = _1.sequelize.define('carts', {
         allowNull: false
     },
     cartUserId: {
-        type: sequelize_1.DataTypes.STRING,
+        type: sequelize_1.DataTypes.INTEGER,
         allowNull: false
     },
     cartProductId: {
-        type: sequelize_1.DataTypes.STRING,
+        type: sequelize_1.DataTypes.INTEGER,
         allowNull: false
     },
     cartTotalItem: {

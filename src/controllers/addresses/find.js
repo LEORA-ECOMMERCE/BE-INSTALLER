@@ -11,7 +11,7 @@ const findAddress = async (req, res) => {
         const result = await address_1.AddressesModel.findOne({
             where: {
                 deleted: { [sequelize_1.Op.eq]: 0 },
-                addressUserId: { [sequelize_1.Op.eq]: req.body?.user?.userId }
+                addressUserId: { [sequelize_1.Op.eq]: req.jwtPayload?.userId }
             }
         });
         const response = response_1.ResponseData.default;

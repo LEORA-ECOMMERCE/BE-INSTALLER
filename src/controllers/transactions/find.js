@@ -15,14 +15,15 @@ const findAllTransaction = async (req, res) => {
         const userRole = await user_1.UserModel.findOne({
             where: {
                 deleted: { [sequelize_1.Op.eq]: 0 },
-                userId: req.body?.user?.userId
+                userId: req.jwtPayload?.userId
             }
         });
-        const page = new pagination_1.Pagination(parseInt(req.query.page) ?? 0, parseInt(req.query.size) ?? 10);
+        const page = new pagination_1.Pagination(Number(req.query.page) ?? 0, Number(req.query.size) ?? 10);
+        console.log(page);
         const result = await transactions_1.TransactionsModel.findAndCountAll({
             where: {
                 ...(Boolean(userRole?.dataValues.userRole === 'user') && {
-                    orderUserId: { [sequelize_1.Op.eq]: req.body?.user?.userId }
+                    transactionUserId: { [sequelize_1.Op.eq]: req.jwtPayload?.userId }
                 }),
                 deleted: { [sequelize_1.Op.eq]: 0 },
                 ...(Boolean(req.query.search) && {
@@ -32,7 +33,7 @@ const findAllTransaction = async (req, res) => {
             include: [
                 {
                     model: user_1.UserModel,
-                    attributes: ['userId', 'userName', 'userPhoto']
+                    attributes: ['userId', 'userName']
                 },
                 { model: orders_1.OrdersModel }
             ],

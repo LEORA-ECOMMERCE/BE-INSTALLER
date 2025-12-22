@@ -5,9 +5,9 @@ exports.OrdersModel = void 0;
 const sequelize_1 = require("sequelize");
 const _1 = require(".");
 const zygote_1 = require("./zygote");
-const products_1 = require("./products");
 const user_1 = require("./user");
 const address_1 = require("./address");
+const orderItems_1 = require("./orderItems");
 exports.OrdersModel = _1.sequelize.define('orders', {
     ...zygote_1.ZygoteModel,
     orderId: {
@@ -20,31 +20,27 @@ exports.OrdersModel = _1.sequelize.define('orders', {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false
     },
-    orderProductId: {
-        type: sequelize_1.DataTypes.STRING,
+    orderSubtotal: {
+        type: sequelize_1.DataTypes.DECIMAL(15, 2),
         allowNull: false
     },
-    orderProductPrice: {
-        type: sequelize_1.DataTypes.DECIMAL,
+    orderShippingFee: {
+        type: sequelize_1.DataTypes.DECIMAL(15, 2),
         allowNull: false
     },
-    orderTotalProductPrice: {
-        type: sequelize_1.DataTypes.DECIMAL,
-        allowNull: false
-    },
-    orderOngkirPrice: {
-        type: sequelize_1.DataTypes.DECIMAL,
+    orderGrandTotal: {
+        type: sequelize_1.DataTypes.DECIMAL(15, 2),
         allowNull: false
     },
     orderTotalItem: {
-        type: sequelize_1.DataTypes.NUMBER,
+        type: sequelize_1.DataTypes.INTEGER,
         allowNull: false
     },
-    orderCourierCode: {
+    orderCourierCompany: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: true
     },
-    orderCourierService: {
+    orderCourierType: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: true
     },
@@ -56,35 +52,47 @@ exports.OrdersModel = _1.sequelize.define('orders', {
         type: sequelize_1.DataTypes.STRING,
         allowNull: true
     },
+    orderDraftId: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true
+    },
+    orderPaymentUrl: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true
+    },
+    orderPaymentToken: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true
+    },
+    orderReferenceId: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true
+    },
     orderStatus: {
-        type: sequelize_1.DataTypes.ENUM('waiting', 'process', 'delivery', 'done', 'cancel'),
+        type: sequelize_1.DataTypes.ENUM('waiting', 'process', 'draft', 'delivery', 'done', 'cancel'),
         allowNull: false,
         defaultValue: 'waiting'
-    },
-    orderTransferBankImage: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
     }
 }, {
-    ..._1.sequelize,
-    timestamps: false,
     tableName: 'orders',
+    timestamps: false,
     deletedAt: false,
     paranoid: true,
     underscored: true,
     freezeTableName: true,
     engine: 'InnoDB'
 });
-exports.OrdersModel.hasOne(products_1.ProductModel, {
-    sourceKey: 'orderProductId',
-    foreignKey: 'productId'
+/* ===================== RELATION ===================== */
+exports.OrdersModel.belongsTo(user_1.UserModel, {
+    foreignKey: 'orderUserId',
+    targetKey: 'userId'
 });
-exports.OrdersModel.hasOne(user_1.UserModel, {
-    sourceKey: 'orderUserId',
-    foreignKey: 'userId'
+exports.OrdersModel.belongsTo(address_1.AddressesModel, {
+    foreignKey: 'orderUserId',
+    targetKey: 'addressUserId'
 });
-exports.OrdersModel.hasOne(address_1.AddressesModel, {
-    sourceKey: 'orderUserId',
-    foreignKey: 'addressUserId'
+exports.OrdersModel.hasMany(orderItems_1.OrderItemsModel, {
+    as: 'orderItems',
+    foreignKey: 'orderId',
+    sourceKey: 'orderId'
 });

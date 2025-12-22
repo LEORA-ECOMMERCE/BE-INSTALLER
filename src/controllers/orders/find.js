@@ -11,23 +11,24 @@ const products_1 = require("../../models/products");
 const user_1 = require("../../models/user");
 const address_1 = require("../../models/address");
 const requestHandler_1 = require("../../utilities/requestHandler");
+const orderItems_1 = require("../../models/orderItems");
 const findAllOrder = async (req, res) => {
     try {
         const user = await user_1.UserModel.findOne({
             where: {
                 deleted: { [sequelize_1.Op.eq]: 0 },
-                userId: req.body?.user?.userId
+                userId: req.jwtPayload?.userId
             }
         });
         const page = new pagination_1.Pagination(parseInt(req.query.page) ?? 0, parseInt(req.query.size) ?? 10);
         const result = await orders_1.OrdersModel.findAndCountAll({
             where: {
                 deleted: { [sequelize_1.Op.eq]: 0 },
+                ...(Boolean(req.query.search) && {
+                    [sequelize_1.Op.or]: [{ orderReferenceId: { [sequelize_1.Op.like]: `%${req.query.search}%` } }]
+                }),
                 ...(Boolean(user?.dataValues.userRole === 'user') && {
-                    orderUserId: { [sequelize_1.Op.eq]: req.body?.user?.userId },
-                    orderStatus: {
-                        [sequelize_1.Op.notIn]: ['done']
-                    }
+                    orderUserId: { [sequelize_1.Op.eq]: req.jwtPayload?.userId }
                 }),
                 ...(Boolean(req.query?.orderStatus) && {
                     orderStatus: { [sequelize_1.Op.eq]: req.query.orderStatus }
@@ -37,24 +38,20 @@ const findAllOrder = async (req, res) => {
                 {
                     model: user_1.UserModel,
                     where: {
-                        deleted: { [sequelize_1.Op.eq]: 0 }
+                        deleted: { [sequelize_1.Op.eq]: 0 },
+                        ...(Boolean(req.query.search) && {
+                            [sequelize_1.Op.or]: [{ userName: { [sequelize_1.Op.like]: `%${req.query.search}%` } }]
+                        })
                     },
                     attributes: ['userName']
                 },
                 {
-                    model: products_1.ProductModel,
-                    where: {
-                        ...(Boolean(req.query.search) && {
-                            [sequelize_1.Op.or]: [{ productName: { [sequelize_1.Op.like]: `%${req.query.search}%` } }]
-                        })
-                    },
-                    attributes: [
-                        'productId',
-                        'productName',
-                        'productImages',
-                        'productDiscount',
-                        'productTotalSale',
-                        'productStock'
+                    model: orderItems_1.OrderItemsModel,
+                    as: 'orderItems',
+                    include: [
+                        {
+                            model: products_1.ProductModel
+                        }
                     ]
                 }
             ],
@@ -92,7 +89,13 @@ const findDetailOrder = async (req, res) => {
             },
             include: [
                 {
-                    model: products_1.ProductModel
+                    model: orderItems_1.OrderItemsModel,
+                    as: 'orderItems',
+                    include: [
+                        {
+                            model: products_1.ProductModel
+                        }
+                    ]
                 },
                 {
                     model: address_1.AddressesModel
@@ -106,11 +109,6 @@ const findDetailOrder = async (req, res) => {
                 }
             ]
         });
-        if (result == null) {
-            const message = 'not found!';
-            const response = response_1.ResponseData.error(message);
-            return res.status(http_status_codes_1.StatusCodes.NOT_FOUND).json(response);
-        }
         const response = response_1.ResponseData.default;
         response.data = result;
         return res.status(http_status_codes_1.StatusCodes.OK).json(response);

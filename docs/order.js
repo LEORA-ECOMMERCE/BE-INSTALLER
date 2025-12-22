@@ -9,37 +9,99 @@
  * @swagger
  * components:
  *   schemas:
+ *     CreateOrderItem:
+ *       type: object
+ *       required:
+ *         - productId
+ *         - quantity
+ *       properties:
+ *         productId:
+ *           type: integer
+ *           example: 1
+ *         quantity:
+ *           type: integer
+ *           minimum: 1
+ *           example: 2
+ *
  *     CreateOrder:
  *       type: object
  *       required:
- *         - orderProductId
- *         - orderOngkirPrice
+ *         - items
+ *         - orderShippingFee
+ *         - orderCourierCompany
+ *         - orderCourierType
  *       properties:
- *         orderProductId:
- *           type: number
- *           example: 12
- *         orderOngkirPrice:
+ *         orderShippingFee:
  *           type: number
  *           example: 15000
+ *         orderCourierCompany:
+ *           type: string
+ *           example: jne
+ *         orderCourierType:
+ *           type: string
+ *           example: delivery
+ *         items:
+ *           type: array
+ *           minItems: 1
+ *           items:
+ *             $ref: '#/components/schemas/CreateOrderItem'
+ *
+ *     OrderItem:
+ *       type: object
+ *       properties:
+ *         orderItemId:
+ *           type: number
+ *           example: 1
+ *         productId:
+ *           type: string
+ *           example: "12"
+ *         productNameSnapshot:
+ *           type: string
+ *           example: Wireless Mouse
+ *         productPriceSnapshot:
+ *           type: number
+ *           example: 35000
+ *         quantity:
+ *           type: integer
+ *           example: 2
+ *         totalPrice:
+ *           type: number
+ *           example: 70000
  *
  *     Order:
  *       type: object
  *       properties:
  *         orderId:
  *           type: number
- *           example: 1
- *         orderProductId:
- *           type: number
- *           example: 12
+ *           example: 101
  *         orderUserId:
+ *           type: string
+ *           example: "USR-001"
+ *         orderSubtotal:
  *           type: number
- *           example: 5
- *         orderTotalProductPrice:
+ *           example: 70000
+ *         orderShippingFee:
  *           type: number
- *           example: 90000
+ *           example: 15000
+ *         orderGrandTotal:
+ *           type: number
+ *           example: 85000
+ *         orderTotalItem:
+ *           type: integer
+ *           example: 2
+ *         orderCourierCode:
+ *           type: string
+ *           example: jne
+ *         orderCourierService:
+ *           type: string
+ *           example: REG
  *         orderStatus:
  *           type: string
- *           example: "pending"
+ *           example: waiting
+ *         orderItems:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/OrderItem'
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -51,7 +113,7 @@
  * @swagger
  * /api/v1/orders:
  *   post:
- *     summary: Create a new order
+ *     summary: Create new order
  *     tags: [ORDERS]
  *     security:
  *       - bearerAuth: []
@@ -75,22 +137,19 @@
  *                 data:
  *                   type: object
  *                   properties:
- *                     message:
- *                       type: string
- *                       example: order created successfully
  *                     orderId:
  *                       type: number
  *                       example: 123
  *                     snapToken:
  *                       type: string
- *                       example: token-mt-123
+ *                       example: snap-token-midtrans
  *                     redirectUrl:
  *                       type: string
- *                       example: https://app.midtrans.com/snap/...
+ *                       example: https://app.midtrans.com/snap/v2/vtweb/xxxx
  *       400:
- *         description: Invalid input or Midtrans error
+ *         description: Invalid request
  *       404:
- *         description: Address or product not found
+ *         description: Product or address not found
  *       500:
  *         description: Server error
  */
@@ -98,7 +157,7 @@
  * @swagger
  * /api/v1/orders:
  *   get:
- *     summary: Get all orders
+ *     summary: Get list of orders
  *     tags: [ORDERS]
  *     security:
  *       - bearerAuth: []
@@ -114,20 +173,10 @@
  *           type: integer
  *           default: 10
  *       - in: query
- *         name: search
- *         schema:
- *           type: string
- *         description: Search product name
- *       - in: query
  *         name: orderStatus
  *         schema:
  *           type: string
- *         description: Filter by order status
- *       - in: query
- *         name: pagination
- *         schema:
- *           type: string
- *           enum: [true, false]
+ *           enum: [waiting, process, delivery, done, cancel]
  *     responses:
  *       200:
  *         description: List of orders
@@ -141,10 +190,16 @@
  *                   example: true
  *                 data:
  *                   type: object
- *                   example:
- *                     totalItems: 10
- *                     totalPages: 1
- *                     currentPage: 0
+ *                   properties:
+ *                     totalItems:
+ *                       type: number
+ *                       example: 10
+ *                     totalPages:
+ *                       type: number
+ *                       example: 1
+ *                     currentPage:
+ *                       type: number
+ *                       example: 0
  *                     items:
  *                       type: array
  *                       items:
@@ -156,48 +211,19 @@
  * @swagger
  * /api/v1/orders/detail/{orderId}:
  *   get:
- *     summary: Get detail order by ID
+ *     summary: Get order detail
  *     tags: [ORDERS]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
- *       - name: orderId
- *         in: path
- *         required: true
- *         schema:
- *           type: number
- *         description: Order ID
- *     responses:
- *       200:
- *         description: Order details retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   $ref: '#/components/schemas/Order'
- *       404:
- *         description: Order not found
- *       500:
- *         description: Server error
- */
-/**
- * @swagger
- * /api/v1/orders:
- *   delete:
- *     summary: Delete an order
- *     tags: [ORDERS]
- *     parameters:
- *       - in: query
+ *       - in: path
  *         name: orderId
  *         required: true
  *         schema:
  *           type: number
  *     responses:
  *       200:
- *         description: Order deleted successfully
+ *         description: Order detail retrieved
  *         content:
  *           application/json:
  *             schema:
@@ -205,10 +231,8 @@
  *               properties:
  *                 success:
  *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: Order deleted successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/Order'
  *       404:
  *         description: Order not found
  *       500:

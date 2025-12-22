@@ -14,7 +14,7 @@ exports.AddressesModel = _1.sequelize.define('addresses', {
         allowNull: false
     },
     addressUserId: {
-        type: sequelize_1.DataTypes.STRING,
+        type: sequelize_1.DataTypes.INTEGER,
         allowNull: false
     },
     addressUserName: {
@@ -53,6 +53,14 @@ exports.AddressesModel = _1.sequelize.define('addresses', {
         type: sequelize_1.DataTypes.ENUM('user', 'admin'),
         allowNull: false,
         defaultValue: 'user'
+    },
+    addressLatitude: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false
+    },
+    addressLongitude: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false
     }
 }, {
     ..._1.sequelize,

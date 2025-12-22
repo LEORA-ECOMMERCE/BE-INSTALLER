@@ -1,117 +1,100 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getShippingRates = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const response_1 = require("../../utilities/response");
-const requestCheker_1 = require("../../utilities/requestCheker");
 const products_1 = require("../../models/products");
 const address_1 = require("../../models/address");
 const requestHandler_1 = require("../../utilities/requestHandler");
-const axios_1 = __importDefault(require("axios"));
+const biteShipService_1 = require("../../services/biteShipService");
 const getShippingRates = async (req, res) => {
-    const emptyField = (0, requestCheker_1.requestChecker)({
-        requireList: ['productId', 'quantity'],
-        requestData: req.body
-    });
-    if (emptyField.length > 0) {
-        const response = response_1.ResponseData.error(`invalid request body! require (${emptyField})`);
-        return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json(response);
-    }
     try {
         /* ======================
-         * 1. Ambil produk
+         * 1. VALIDATE BODY
          * ====================== */
-        const product = await products_1.ProductModel.findOne({
+        if (!Array.isArray(req.body) || req.body.length === 0) {
+            return res
+                .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
+                .json(response_1.ResponseData.error('Request body must be a non-empty array'));
+        }
+        const payloadItems = req.body;
+        for (const item of payloadItems) {
+            if (!item.productId || !item.quantity) {
+                return res
+                    .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
+                    .json(response_1.ResponseData.error('Each item must have productId and quantity'));
+            }
+        }
+        /* ======================
+         * 2. FETCH PRODUCTS
+         * ====================== */
+        const productIds = payloadItems.map((item) => item.productId);
+        const products = await products_1.ProductModel.findAll({
             where: {
-                productId: req.body.productId,
+                productId: productIds,
                 deleted: 0
             }
         });
-        if (product == null) {
+        if (products.length !== payloadItems.length) {
             return res
                 .status(http_status_codes_1.StatusCodes.NOT_FOUND)
-                .json(response_1.ResponseData.error('product not found'));
+                .json(response_1.ResponseData.error('One or more products not found'));
         }
         /* ======================
-         * 2. Ambil alamat toko
+         * 3. FETCH ADDRESSES
          * ====================== */
-        const storeAddress = await address_1.AddressesModel.findOne({
+        const originAddress = await address_1.AddressesModel.findOne({
             where: {
                 addressCategory: 'admin',
                 deleted: 0
             }
         });
-        if (storeAddress == null) {
+        if (!originAddress) {
             return res
                 .status(http_status_codes_1.StatusCodes.NOT_FOUND)
-                .json(response_1.ResponseData.error('store address not found'));
+                .json(response_1.ResponseData.error('Store address not found'));
         }
-        /* ======================
-         * 2. Ambil alamat tujuan
-         * ====================== */
         const destinationAddress = await address_1.AddressesModel.findOne({
             where: {
-                addressUserId: req.body.user.userId,
+                addressUserId: req.jwtPayload?.userId,
                 addressCategory: 'user',
                 deleted: 0
             }
         });
-        if (destinationAddress == null) {
+        if (!destinationAddress) {
             return res
                 .status(http_status_codes_1.StatusCodes.NOT_FOUND)
-                .json(response_1.ResponseData.error('destination address not found'));
+                .json(response_1.ResponseData.error('Destination address not found'));
         }
         /* ======================
-         * 3. Hitung berat & harga
+         * 4. BUILD ITEMS
          * ====================== */
-        const quantity = Number(req.body.quantity);
-        const items = [
-            {
+        const items = payloadItems.map((payloadItem) => {
+            const product = products.find((p) => p.productId === payloadItem.productId);
+            return {
                 name: product.productName,
                 value: Number(product.productPrice),
                 weight: Number(product.productWeight),
-                quantity
-            }
-        ];
-        console.log('============ship');
-        console.log(storeAddress);
-        console.log(destinationAddress);
-        /* ======================
-         * 4. Request ke Biteship
-         * ====================== */
-        const biteshipResponse = await axios_1.default.post(`${process.env.BITESHIP_BASE_URL}/rates/couriers`, {
-            origin_postal_code: storeAddress.addressPostalCode,
-            destination_postal_code: destinationAddress.addressPostalCode,
-            couriers: 'jne,jnt,sicepat,anteraja',
-            items: [
-                {
-                    name: 'Shoes',
-                    description: 'Black colored size 45',
-                    value: 199000,
-                    length: 30,
-                    width: 15,
-                    height: 20,
-                    weight: 200,
-                    quantity: 2
-                }
-            ]
-        }, {
-            headers: {
-                Authorization: `Bearer ${process.env.BITESHIP_API_KEY}`,
-                'Content-Type': 'application/json'
-            }
+                quantity: Number(payloadItem.quantity)
+            };
         });
-        console.log('============ship');
-        console.log(JSON.stringify(biteshipResponse));
+        /* ======================
+         * 5. REQUEST TO BITESHIP
+         * ====================== */
+        const biteshipResponse = await biteShipService_1.BiteShipService.post('/rates/couriers', {
+            origin_latitude: Number(originAddress.addressLatitude),
+            origin_longitude: Number(originAddress.addressLongitude),
+            destination_latitude: Number(destinationAddress.addressLatitude),
+            destination_longitude: Number(destinationAddress.addressLongitude),
+            couriers: 'gojek,grab',
+            items
+        });
         const response = response_1.ResponseData.default;
         response.data = biteshipResponse.data;
         return res.status(http_status_codes_1.StatusCodes.OK).json(response);
     }
-    catch (serverError) {
-        return (0, requestHandler_1.handleServerError)(res, serverError);
+    catch (error) {
+        return (0, requestHandler_1.handleServerError)(res, error);
     }
 };
 exports.getShippingRates = getShippingRates;
