@@ -5,6 +5,7 @@ const middlewares_1 = require("../../middlewares");
 const products_1 = require("../../controllers/products");
 const ProductRoute = (0, express_1.Router)();
 ProductRoute.get('/', products_1.ProductController.findAll);
+ProductRoute.get('/highlights', products_1.ProductController.findAllHightlightProducts);
 ProductRoute.get('/detail/:productId', products_1.ProductController.findOne);
 ProductRoute.post('/', middlewares_1.MiddleWares.authorization, middlewares_1.MiddleWares.allowAppRoles('admin', 'superAdmin'), products_1.ProductController.create);
 ProductRoute.patch('/', middlewares_1.MiddleWares.authorization, middlewares_1.MiddleWares.allowAppRoles('admin', 'superAdmin'), products_1.ProductController.update);
