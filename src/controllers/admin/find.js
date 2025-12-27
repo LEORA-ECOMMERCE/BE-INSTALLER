@@ -10,12 +10,12 @@ const pagination_1 = require("../../utilities/pagination");
 const requestHandler_1 = require("../../utilities/requestHandler");
 const findAllAdmin = async (req, res) => {
     try {
-        const page = new pagination_1.Pagination(parseInt(req.query.page) ?? 0, parseInt(req.query.size) ?? 10);
+        const page = new pagination_1.Pagination(Number(req.query.page) ?? 0, Number(req.query.size) ?? 10);
         const users = await user_1.UserModel.findAndCountAll({
             where: {
                 deleted: { [sequelize_1.Op.eq]: 0 },
                 userRole: { [sequelize_1.Op.not]: 'user' },
-                userId: { [sequelize_1.Op.not]: req.body?.user?.userId },
+                userId: { [sequelize_1.Op.not]: req.jwtPayload?.userId },
                 ...(Boolean(req.query.search) && {
                     [sequelize_1.Op.or]: [{ userName: { [sequelize_1.Op.like]: `%${req.query.search}%` } }]
                 })
@@ -54,7 +54,14 @@ const findDetailAdmin = async (req, res) => {
                 userRole: { [sequelize_1.Op.not]: 'user' },
                 userId: { [sequelize_1.Op.eq]: requestParams.userId }
             },
-            attributes: ['userId', 'userName', 'userRole', 'createdAt', 'updatedAt']
+            attributes: [
+                'userId',
+                'userName',
+                'userRole',
+                'userWhatsAppNumber',
+                'createdAt',
+                'updatedAt'
+            ]
         });
         if (user == null) {
             const message = 'admin not found!';

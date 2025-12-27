@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const promotions_1 = require("../../controllers/promotions");
+const middlewares_1 = require("../../middlewares");
+const PromotionRoute = (0, express_1.Router)();
+PromotionRoute.get('/', promotions_1.PromotionController.findAllPromotion);
+PromotionRoute.patch('/', middlewares_1.MiddleWares.authorization, middlewares_1.MiddleWares.allowAppRoles('admin', 'superAdmin'), promotions_1.PromotionController.updatePromotion);
+PromotionRoute.delete('/', middlewares_1.MiddleWares.authorization, middlewares_1.MiddleWares.allowAppRoles('admin', 'superAdmin'), promotions_1.PromotionController.removePromotion);
+exports.default = PromotionRoute;

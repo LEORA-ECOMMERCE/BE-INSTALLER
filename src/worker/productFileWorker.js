@@ -32,7 +32,7 @@ new bullmq_1.Worker('product-file-queue', async (job) => {
         const products = data.map((item) => ({
             productName: item.nama,
             productDescription: item.deskripsi,
-            productImages: item.image,
+            productImages: `${[item.image]}`,
             productPrice: Number(item.harga) || 0,
             productCategoryId: item.kategori,
             productSubCategoryId: item.subkategori,

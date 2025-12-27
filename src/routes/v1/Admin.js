@@ -5,7 +5,7 @@ const admin_1 = require("../../controllers/admin");
 const middlewares_1 = require("../../middlewares");
 const AdminRoute = (0, express_1.Router)();
 AdminRoute.get('/', middlewares_1.MiddleWares.authorization, admin_1.AdminController.allAdmin);
-AdminRoute.get('/detail:/userId', middlewares_1.MiddleWares.authorization, admin_1.AdminController.find);
+AdminRoute.get('/detail/:userId', middlewares_1.MiddleWares.authorization, admin_1.AdminController.find);
 AdminRoute.patch('/', middlewares_1.MiddleWares.authorization, admin_1.AdminController.update);
 AdminRoute.post('/register', middlewares_1.MiddleWares.authorization, admin_1.AdminController.create);
 AdminRoute.post('/login', admin_1.AdminController.login);

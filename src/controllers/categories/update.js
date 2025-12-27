@@ -31,7 +31,8 @@ const updateCategory = async (req, res) => {
             return res.status(http_status_codes_1.StatusCodes.NOT_FOUND).json(response);
         }
         const newData = {
-            ...(requestBody.categoryIcon.length > 0 && {
+            ...(requestBody?.categoryIcon &&
+                requestBody.categoryIcon.toString().length > 0 && {
                 categoryIcon: requestBody.categoryIcon
             }),
             ...(requestBody.categoryName.length > 0 && {

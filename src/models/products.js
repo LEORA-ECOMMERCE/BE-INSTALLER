@@ -65,6 +65,11 @@ exports.ProductModel = _1.sequelize.define('products', {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0
+    },
+    productIsHighlight: {
+        type: sequelize_1.DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
     }
 }, {
     ..._1.sequelize,

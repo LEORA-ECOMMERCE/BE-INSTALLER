@@ -12,6 +12,7 @@ const MyProfileRouter_1 = __importDefault(require("./MyProfileRouter"));
 const NotificationRouter_1 = __importDefault(require("./NotificationRouter"));
 const OrderRouter_1 = __importDefault(require("./OrderRouter"));
 const ProductRouter_1 = __importDefault(require("./ProductRouter"));
+const PromotionRouter_1 = __importDefault(require("./PromotionRouter"));
 const SettingRouter_1 = __importDefault(require("./SettingRouter"));
 const ShippingRouter_1 = __importDefault(require("./ShippingRouter"));
 const StatisticRouter_1 = __importDefault(require("./StatisticRouter"));
@@ -35,6 +36,7 @@ const RoutesRegistry = {
     UserRoute: UserRouter_1.default,
     WablasRoute: WaBlasRouter_1.default,
     ShippingRoute: ShippingRouter_1.default,
-    WebhookRouter: WebhookRouter_1.default
+    WebhookRouter: WebhookRouter_1.default,
+    PromotionRoute: PromotionRouter_1.default
 };
 exports.default = RoutesRegistry;
