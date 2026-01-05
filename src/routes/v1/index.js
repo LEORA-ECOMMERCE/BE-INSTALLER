@@ -28,6 +28,7 @@ routers.use('/api/v1/shipping', registry_1.default.ShippingRoute);
 routers.use('/api/v1/wa-blas', registry_1.default.WablasRoute);
 routers.use('/api/v1/webhooks', registry_1.default.WebhookRouter);
 routers.use('/api/v1/promotions', registry_1.default.PromotionRoute);
+routers.use('/api/v1/public', registry_1.default.PublicRouter);
 routers.use('/docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.swaggerSpec));
 routers.use((req, res) => {
     const message = `Route not found!`;

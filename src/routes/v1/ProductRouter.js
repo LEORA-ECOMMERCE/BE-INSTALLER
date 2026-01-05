@@ -6,6 +6,7 @@ const products_1 = require("../../controllers/products");
 const promotions_1 = require("../../controllers/promotions");
 const ProductRoute = (0, express_1.Router)();
 ProductRoute.get('/', products_1.ProductController.findAll);
+ProductRoute.get('/admin', products_1.ProductController.findAllProductsAdmin);
 ProductRoute.get('/highlights', promotions_1.PromotionController.findAllPromotion);
 ProductRoute.get('/detail/:productId', products_1.ProductController.findOne);
 ProductRoute.post('/', middlewares_1.MiddleWares.authorization, middlewares_1.MiddleWares.allowAppRoles('admin', 'superAdmin'), products_1.ProductController.create);

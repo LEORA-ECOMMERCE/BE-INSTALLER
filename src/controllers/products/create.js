@@ -17,6 +17,7 @@ const createProduct = async (req, res) => {
             discountPercent: Number(validatedData.productDiscount)
         });
         validatedData.productSellPrice = productSellPrice;
+        validatedData.productIsVisible = true;
         await products_1.ProductModel.create(validatedData);
         const response = response_1.ResponseData.default;
         const result = { message: 'success' };

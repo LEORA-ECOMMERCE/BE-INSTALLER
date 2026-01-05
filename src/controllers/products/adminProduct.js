@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findDetailProduct = exports.findAllProducts = void 0;
+exports.findDetailProduct = exports.findAllProductsAdmin = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const response_1 = require("../../utilities/response");
 const sequelize_1 = require("sequelize");
@@ -9,13 +9,12 @@ const requestCheker_1 = require("../../utilities/requestCheker");
 const products_1 = require("../../models/products");
 const categories_1 = require("../../models/categories");
 const requestHandler_1 = require("../../utilities/requestHandler");
-const findAllProducts = async (req, res) => {
+const findAllProductsAdmin = async (req, res) => {
     try {
         const page = new pagination_1.Pagination(parseInt(req.query.page) ?? 0, parseInt(req.query.size) ?? 10);
         const result = await products_1.ProductModel.findAndCountAll({
             where: {
                 deleted: { [sequelize_1.Op.eq]: 0 },
-                productIsVisible: { [sequelize_1.Op.eq]: true },
                 ...(Boolean(req.query.search) && {
                     [sequelize_1.Op.or]: [{ productName: { [sequelize_1.Op.like]: `%${req.query.search}%` } }]
                 }),
@@ -41,7 +40,7 @@ const findAllProducts = async (req, res) => {
         return (0, requestHandler_1.handleServerError)(res, serverError);
     }
 };
-exports.findAllProducts = findAllProducts;
+exports.findAllProductsAdmin = findAllProductsAdmin;
 const findDetailProduct = async (req, res) => {
     const requestParams = req.params;
     const emptyField = (0, requestCheker_1.requestChecker)({

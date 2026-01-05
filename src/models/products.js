@@ -49,7 +49,8 @@ exports.ProductModel = _1.sequelize.define('products', {
     },
     productCode: {
         type: sequelize_1.DataTypes.STRING(100),
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     productTotalSale: {
         type: sequelize_1.DataTypes.INTEGER,
@@ -70,6 +71,19 @@ exports.ProductModel = _1.sequelize.define('products', {
         type: sequelize_1.DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
+    },
+    productIsVisible: {
+        type: sequelize_1.DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
+    productBarcode: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true
+    },
+    productUnit: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true
     }
 }, {
     ..._1.sequelize,
