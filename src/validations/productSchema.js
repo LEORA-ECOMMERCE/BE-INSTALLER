@@ -110,7 +110,7 @@ exports.updateProductSchema = joi_1.default
   .object({
     productId: joi_1.default.number().integer().positive().required(),
     productName: joi_1.default.string().trim().min(3).max(255).optional(),
-    productDescription: joi_1.default.string().optional(),
+    productDescription: joi_1.default.string().optional().allow(""),
     productImages: joi_1.default
       .alternatives()
       .try(
