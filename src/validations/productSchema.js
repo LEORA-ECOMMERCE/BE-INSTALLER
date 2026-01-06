@@ -110,18 +110,19 @@ exports.updateProductSchema = joi_1.default
   .object({
     productId: joi_1.default.number().integer().positive().required(),
     productName: joi_1.default.string().trim().min(3).max(255).optional(),
-    productDescription: joi_1.default.string().trim().min(5).optional(),
+    productDescription: joi_1.default.string().optional(),
     productImages: joi_1.default
       .alternatives()
       .try(
-        joi_1.default.array().items(joi_1.default.string().uri()).min(1),
+        joi_1.default.array().items(joi_1.default.string().uri()),
         joi_1.default.string().uri()
       )
-      .optional(),
+      .optional()
+      .default([]),
     productPrice: joi_1.default.number().positive().optional(),
     productDiscount: joi_1.default.number().min(0).max(100).optional(),
-    productCategoryId: joi_1.default.string().trim().optional(),
-    productSubCategoryId: joi_1.default.string().trim().optional(),
+    productCategoryId: joi_1.default.number().optional(),
+    productSubCategoryId: joi_1.default.number().optional(),
     productTotalSale: joi_1.default.number().integer().min(0).optional(),
     productCode: joi_1.default.string().trim().optional(),
     productStock: joi_1.default.number().integer().min(0).optional(),
