@@ -114,8 +114,8 @@ exports.updateProductSchema = joi_1.default
     productImages: joi_1.default
       .alternatives()
       .try(
-        joi_1.default.array().items(joi_1.default.string().uri()),
-        joi_1.default.string().uri()
+        joi_1.default.array().items(joi_1.default.string()),
+        joi_1.default.string()
       )
       .optional()
       .default([]),
