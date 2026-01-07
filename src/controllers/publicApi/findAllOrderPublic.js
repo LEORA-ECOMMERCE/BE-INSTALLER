@@ -55,14 +55,14 @@ const findAllOrderPublic = async (req, res) => {
         [
           (0, sequelize_1.fn)(
             "DATE",
-            (0, sequelize_1.col)("OrdersModel.createdAt")
+            (0, sequelize_1.col)("OrdersModel.created_at")
           ),
           "orderDate",
         ],
         [
           (0, sequelize_1.fn)(
             "TIME",
-            (0, sequelize_1.col)("OrdersModel.createdAt")
+            (0, sequelize_1.col)("OrdersModel.created_at")
           ),
           "orderTime",
         ],
