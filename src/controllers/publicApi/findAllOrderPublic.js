@@ -52,8 +52,20 @@ const findAllOrderPublic = async (req, res) => {
         "orderPaymentUrl",
         "orderReferenceId",
         "orderStatus",
-        [fn("DATE", col("OrdersModel.createdAt")), "orderDate"],
-        [fn("TIME", col("OrdersModel.createdAt")), "orderTime"],
+        [
+          (0, sequelize_1.fn)(
+            "DATE",
+            (0, sequelize_1.col)("OrdersModel.createdAt")
+          ),
+          "orderDate",
+        ],
+        [
+          (0, sequelize_1.fn)(
+            "TIME",
+            (0, sequelize_1.col)("OrdersModel.createdAt")
+          ),
+          "orderTime",
+        ],
       ],
       include: [
         {
