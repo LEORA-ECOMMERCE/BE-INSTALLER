@@ -12,85 +12,102 @@ const requestHandler_1 = require("../../utilities/requestHandler");
 const orderItems_1 = require("../../models/orderItems");
 const publicApiSchema_1 = require("../../validations/publicApiSchema");
 const findAllOrderPublic = async (req, res) => {
-    const { error: validationError, value: validatedData } = (0, requestHandler_1.validateRequest)(publicApiSchema_1.findAllOrderPublicSchema, req.query);
-    if (validationError)
-        return (0, requestHandler_1.handleValidationError)(res, validationError);
-    try {
-        const page = new pagination_1.Pagination(parseInt(req.query.page) ?? 0, parseInt(req.query.size) ?? 10);
-        const result = await orders_1.OrdersModel.findAndCountAll({
-            where: {
-                deleted: { [sequelize_1.Op.eq]: 0 },
-                ...(Boolean(req.query.search) && {
-                    [sequelize_1.Op.or]: [{ orderReferenceId: { [sequelize_1.Op.like]: `%${req.query.search}%` } }]
-                }),
-                ...(Boolean(req.query?.orderStatus) && {
-                    orderStatus: { [sequelize_1.Op.eq]: req.query.orderStatus }
-                })
+  const { error: validationError, value: validatedData } = (0,
+  requestHandler_1.validateRequest)(
+    publicApiSchema_1.findAllOrderPublicSchema,
+    req.query
+  );
+  if (validationError)
+    return (0, requestHandler_1.handleValidationError)(res, validationError);
+  try {
+    const page = new pagination_1.Pagination(
+      parseInt(req.query.page) ?? 0,
+      parseInt(req.query.size) ?? 10
+    );
+    const result = await orders_1.OrdersModel.findAndCountAll({
+      where: {
+        deleted: { [sequelize_1.Op.eq]: 0 },
+        ...(Boolean(req.query.search) && {
+          [sequelize_1.Op.or]: [
+            {
+              orderReferenceId: {
+                [sequelize_1.Op.like]: `%${req.query.search}%`,
+              },
             },
-            attributes: [
-                'orderId',
-                'orderSubtotal',
-                'orderShippingFee',
-                'orderGrandTotal',
-                'orderTotalItem',
-                'orderCourierCompany',
-                'orderTrackingId',
-                'orderWaybillId',
-                'orderPaymentUrl',
-                'orderReferenceId',
-                'orderStatus'
-            ],
-            include: [
+          ],
+        }),
+        ...(Boolean(req.query?.orderStatus) && {
+          orderStatus: { [sequelize_1.Op.eq]: req.query.orderStatus },
+        }),
+      },
+      attributes: [
+        "orderId",
+        "orderSubtotal",
+        "orderShippingFee",
+        "orderGrandTotal",
+        "orderTotalItem",
+        "orderCourierCompany",
+        "orderTrackingId",
+        "orderWaybillId",
+        "orderPaymentUrl",
+        "orderReferenceId",
+        "orderStatus",
+        "createdAt",
+      ],
+      include: [
+        {
+          model: user_1.UserModel,
+          where: {
+            deleted: { [sequelize_1.Op.eq]: 0 },
+            ...(Boolean(req.query.search) && {
+              [sequelize_1.Op.or]: [
                 {
-                    model: user_1.UserModel,
-                    where: {
-                        deleted: { [sequelize_1.Op.eq]: 0 },
-                        ...(Boolean(req.query.search) && {
-                            [sequelize_1.Op.or]: [{ userName: { [sequelize_1.Op.like]: `%${req.query.search}%` } }]
-                        })
-                    },
-                    attributes: ['userName', 'userWhatsAppNumber']
+                  userName: { [sequelize_1.Op.like]: `%${req.query.search}%` },
                 },
-                {
-                    model: orderItems_1.OrderItemsModel,
-                    as: 'orderItems',
-                    attributes: [
-                        'productNameSnapshot',
-                        'productPriceSnapshot',
-                        'productDiscountSnapshot',
-                        'productSellPriceSnapshot',
-                        'quantity',
-                        'totalPrice'
-                    ],
-                    include: [
-                        {
-                            model: products_1.ProductModel,
-                            attributes: [
-                                'productId',
-                                'productName',
-                                'productCode',
-                                'productStock',
-                                'productWeight',
-                                'productIsVisible',
-                                'productBarcode',
-                                'productUnit'
-                            ]
-                        }
-                    ]
-                }
-            ],
-            order: [['orderId', 'desc']],
-            ...(req.query.pagination === 'true' && {
-                limit: page.limit,
-                offset: page.offset
-            })
-        });
-        const response = response_1.ResponseData.default;
-        response.data = page.data(result);
-        return res.status(http_status_codes_1.StatusCodes.OK).json(response);
-    }
-    catch (serverError) {
-        return (0, requestHandler_1.handleServerError)(res, serverError);
-    }
+              ],
+            }),
+          },
+          attributes: ["userName", "userWhatsAppNumber"],
+        },
+        {
+          model: orderItems_1.OrderItemsModel,
+          as: "orderItems",
+          attributes: [
+            "productNameSnapshot",
+            "productPriceSnapshot",
+            "productDiscountSnapshot",
+            "productSellPriceSnapshot",
+            "quantity",
+            "totalPrice",
+          ],
+          include: [
+            {
+              model: products_1.ProductModel,
+              attributes: [
+                "productId",
+                "productName",
+                "productCode",
+                "productStock",
+                "productWeight",
+                "productIsVisible",
+                "productBarcode",
+                "productUnit",
+              ],
+            },
+          ],
+        },
+      ],
+      order: [["orderId", "desc"]],
+      ...(req.query.pagination === "true" && {
+        limit: page.limit,
+        offset: page.offset,
+      }),
+    });
+    const response = response_1.ResponseData.default;
+    response.data = page.data(result);
+    return res.status(http_status_codes_1.StatusCodes.OK).json(response);
+  } catch (serverError) {
+    return (0, requestHandler_1.handleServerError)(res, serverError);
+  }
 };
 exports.findAllOrderPublic = findAllOrderPublic;
