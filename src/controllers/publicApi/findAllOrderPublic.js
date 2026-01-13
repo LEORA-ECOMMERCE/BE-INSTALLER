@@ -24,9 +24,27 @@ const findAllOrderPublic = async (req, res) => {
       parseInt(req.query.page) ?? 0,
       parseInt(req.query.size) ?? 10
     );
+    const dateFilter = {};
+    if (req.query.startDate && req.query.endDate) {
+      dateFilter.created_at = {
+        [sequelize_1.Op.between]: [
+          `${req.query.startDate} 00:00:00`,
+          `${req.query.endDate} 23:59:59`,
+        ],
+      };
+    } else if (req.query.startDate) {
+      dateFilter.created_at = {
+        [sequelize_1.Op.gte]: `${req.query.startDate} 00:00:00`,
+      };
+    } else if (req.query.endDate) {
+      dateFilter.created_at = {
+        [sequelize_1.Op.lte]: `${req.query.endDate} 23:59:59`,
+      };
+    }
     const result = await orders_1.OrdersModel.findAndCountAll({
       where: {
         deleted: { [sequelize_1.Op.eq]: 0 },
+        ...dateFilter,
         ...(Boolean(req.query.search) && {
           [sequelize_1.Op.or]: [
             {
