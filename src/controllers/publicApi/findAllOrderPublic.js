@@ -12,133 +12,104 @@ const requestHandler_1 = require("../../utilities/requestHandler");
 const orderItems_1 = require("../../models/orderItems");
 const publicApiSchema_1 = require("../../validations/publicApiSchema");
 const findAllOrderPublic = async (req, res) => {
-  const { error: validationError, value: validatedData } = (0,
-  requestHandler_1.validateRequest)(
-    publicApiSchema_1.findAllOrderPublicSchema,
-    req.query
-  );
-  if (validationError)
-    return (0, requestHandler_1.handleValidationError)(res, validationError);
-  try {
-    const page = new pagination_1.Pagination(
-      parseInt(req.query.page) ?? 0,
-      parseInt(req.query.size) ?? 10
-    );
-    const dateFilter = {};
-    if (req.query.startDate && req.query.endDate) {
-      dateFilter.created_at = {
-        [sequelize_1.Op.between]: [
-          `${req.query.startDate} 00:00:00`,
-          `${req.query.endDate} 23:59:59`,
-        ],
-      };
-    } else if (req.query.startDate) {
-      dateFilter.created_at = {
-        [sequelize_1.Op.gte]: `${req.query.startDate} 00:00:00`,
-      };
-    } else if (req.query.endDate) {
-      dateFilter.created_at = {
-        [sequelize_1.Op.lte]: `${req.query.endDate} 23:59:59`,
-      };
-    }
-    const result = await orders_1.OrdersModel.findAndCountAll({
-      where: {
-        deleted: { [sequelize_1.Op.eq]: 0 },
-        ...dateFilter,
-        ...(Boolean(req.query.search) && {
-          [sequelize_1.Op.or]: [
-            {
-              orderReferenceId: {
-                [sequelize_1.Op.like]: `%${req.query.search}%`,
-              },
+    const { error: validationError, value: validatedData } = (0, requestHandler_1.validateRequest)(publicApiSchema_1.findAllOrderPublicSchema, req.query);
+    if (validationError)
+        return (0, requestHandler_1.handleValidationError)(res, validationError);
+    try {
+        const page = new pagination_1.Pagination(parseInt(req.query.page) ?? 0, parseInt(req.query.size) ?? 10);
+        const dateFilter = {};
+        if (req.query.startDate && req.query.endDate) {
+            dateFilter.created_at = {
+                [sequelize_1.Op.between]: [`${req.query.startDate} 00:00:00`, `${req.query.endDate} 23:59:59`]
+            };
+        }
+        else if (req.query.startDate) {
+            dateFilter.created_at = {
+                [sequelize_1.Op.gte]: `${req.query.startDate} 00:00:00`
+            };
+        }
+        else if (req.query.endDate) {
+            dateFilter.created_at = {
+                [sequelize_1.Op.lte]: `${req.query.endDate} 23:59:59`
+            };
+        }
+        const result = await orders_1.OrdersModel.findAndCountAll({
+            where: {
+                deleted: { [sequelize_1.Op.eq]: 0 },
+                ...dateFilter,
+                ...(Boolean(req.query.search) && {
+                    [sequelize_1.Op.or]: [{ orderReferenceId: { [sequelize_1.Op.like]: `%${req.query.search}%` } }]
+                }),
+                ...(Boolean(req.query?.orderStatus) && {
+                    orderStatus: { [sequelize_1.Op.eq]: req.query.orderStatus }
+                })
             },
-          ],
-        }),
-        ...(Boolean(req.query?.orderStatus) && {
-          orderStatus: { [sequelize_1.Op.eq]: req.query.orderStatus },
-        }),
-      },
-      attributes: [
-        "orderId",
-        "orderSubtotal",
-        "orderShippingFee",
-        "orderGrandTotal",
-        "orderTotalItem",
-        "orderCourierCompany",
-        "orderTrackingId",
-        "orderWaybillId",
-        "orderPaymentUrl",
-        "orderReferenceId",
-        "orderStatus",
-        [
-          (0, sequelize_1.fn)(
-            "DATE",
-            (0, sequelize_1.col)("orders.created_at")
-          ),
-          "orderDate",
-        ],
-        [
-          (0, sequelize_1.fn)(
-            "TIME",
-            (0, sequelize_1.col)("orders.created_at")
-          ),
-          "orderTime",
-        ],
-      ],
-      include: [
-        {
-          model: user_1.UserModel,
-          where: {
-            deleted: { [sequelize_1.Op.eq]: 0 },
-            ...(Boolean(req.query.search) && {
-              [sequelize_1.Op.or]: [
+            attributes: [
+                'orderId',
+                'orderSubtotal',
+                'orderShippingFee',
+                'orderGrandTotal',
+                'orderTotalItem',
+                'orderCourierCompany',
+                'orderTrackingId',
+                'orderWaybillId',
+                'orderPaymentUrl',
+                'orderReferenceId',
+                'orderStatus',
+                [(0, sequelize_1.fn)('DATE', (0, sequelize_1.col)('orders.created_at')), 'orderDate'],
+                [(0, sequelize_1.fn)('TIME', (0, sequelize_1.col)('orders.created_at')), 'orderTime']
+            ],
+            include: [
                 {
-                  userName: { [sequelize_1.Op.like]: `%${req.query.search}%` },
+                    model: user_1.UserModel,
+                    where: {
+                        deleted: { [sequelize_1.Op.eq]: 0 },
+                        ...(Boolean(req.query.search) && {
+                            [sequelize_1.Op.or]: [{ userName: { [sequelize_1.Op.like]: `%${req.query.search}%` } }]
+                        })
+                    },
+                    attributes: ['userName', 'userWhatsAppNumber']
                 },
-              ],
-            }),
-          },
-          attributes: ["userName", "userWhatsAppNumber"],
-        },
-        {
-          model: orderItems_1.OrderItemsModel,
-          as: "orderItems",
-          attributes: [
-            "productNameSnapshot",
-            "productPriceSnapshot",
-            "productDiscountSnapshot",
-            "productSellPriceSnapshot",
-            "quantity",
-            "totalPrice",
-          ],
-          include: [
-            {
-              model: products_1.ProductModel,
-              attributes: [
-                "productId",
-                "productName",
-                "productCode",
-                "productStock",
-                "productWeight",
-                "productIsVisible",
-                "productBarcode",
-                "productUnit",
-              ],
-            },
-          ],
-        },
-      ],
-      order: [["orderId", "desc"]],
-      ...(req.query.pagination === "true" && {
-        limit: page.limit,
-        offset: page.offset,
-      }),
-    });
-    const response = response_1.ResponseData.default;
-    response.data = page.data(result);
-    return res.status(http_status_codes_1.StatusCodes.OK).json(response);
-  } catch (serverError) {
-    return (0, requestHandler_1.handleServerError)(res, serverError);
-  }
+                {
+                    model: orderItems_1.OrderItemsModel,
+                    as: 'orderItems',
+                    attributes: [
+                        'productNameSnapshot',
+                        'productPriceSnapshot',
+                        'productDiscountSnapshot',
+                        'productSellPriceSnapshot',
+                        'quantity',
+                        'totalPrice'
+                    ],
+                    include: [
+                        {
+                            model: products_1.ProductModel,
+                            attributes: [
+                                'productId',
+                                'productName',
+                                'productCode',
+                                'productStock',
+                                'productWeight',
+                                'productIsVisible',
+                                'productBarcode',
+                                'productUnit'
+                            ]
+                        }
+                    ]
+                }
+            ],
+            order: [['orderId', 'desc']],
+            ...(req.query.pagination === 'true' && {
+                limit: page.limit,
+                offset: page.offset
+            })
+        });
+        const response = response_1.ResponseData.default;
+        response.data = page.data(result);
+        return res.status(http_status_codes_1.StatusCodes.OK).json(response);
+    }
+    catch (serverError) {
+        return (0, requestHandler_1.handleServerError)(res, serverError);
+    }
 };
 exports.findAllOrderPublic = findAllOrderPublic;

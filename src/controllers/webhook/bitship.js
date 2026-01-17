@@ -11,7 +11,6 @@ const logs_1 = __importDefault(require("../../logs"));
 const bitshipWebhookHandler = async (req, res) => {
     const payload = req.body;
     try {
-        console.log('====pas 1');
         if (payload && payload.courier_waybill_id) {
             const order = await orders_1.OrdersModel.findOne({
                 where: {

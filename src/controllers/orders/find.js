@@ -20,7 +20,6 @@ const findAllOrder = async (req, res) => {
                 userId: req.jwtPayload?.userId
             }
         });
-        console.log(req.query);
         const page = new pagination_1.Pagination(parseInt(req.query.page) ?? 0, parseInt(req.query.size) ?? 10);
         const result = await orders_1.OrdersModel.findAndCountAll({
             where: {

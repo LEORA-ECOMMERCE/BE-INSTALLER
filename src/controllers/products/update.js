@@ -13,9 +13,14 @@ const updateProduct = async (req, res) => {
     if (error)
         return (0, requestHandler_1.handleValidationError)(res, error);
     try {
+        /**
+         * ===============================
+         * FIND CURRENT PRODUCT
+         * ===============================
+         */
         const product = await products_1.ProductModel.findOne({
             where: {
-                deleted: { [sequelize_1.Op.eq]: 0 },
+                deleted: 0,
                 productId: validatedData.productId
             }
         });
@@ -24,6 +29,50 @@ const updateProduct = async (req, res) => {
                 .status(http_status_codes_1.StatusCodes.NOT_FOUND)
                 .json(response_1.ResponseData.error('Product not found'));
         }
+        /**
+         * ===============================
+         * CHECK DUPLICATE CODE / BARCODE
+         * ===============================
+         */
+        if (validatedData.productCode || validatedData.productBarcode) {
+            const orConditions = [];
+            if (validatedData.productCode) {
+                orConditions.push({ productCode: validatedData.productCode });
+            }
+            if (validatedData.productBarcode) {
+                orConditions.push({ productBarcode: validatedData.productBarcode });
+            }
+            const duplicateProduct = await products_1.ProductModel.findOne({
+                where: {
+                    deleted: 0,
+                    productId: { [sequelize_1.Op.ne]: validatedData.productId },
+                    [sequelize_1.Op.or]: orConditions
+                }
+            });
+            if (duplicateProduct) {
+                let message = 'Product sudah terdaftar';
+                if (validatedData.productCode &&
+                    validatedData.productBarcode &&
+                    duplicateProduct.productCode === validatedData.productCode &&
+                    duplicateProduct.productBarcode === validatedData.productBarcode) {
+                    message = 'Product code dan barcode sudah terdaftar';
+                }
+                else if (validatedData.productCode &&
+                    duplicateProduct.productCode === validatedData.productCode) {
+                    message = 'Product code sudah terdaftar';
+                }
+                else if (validatedData.productBarcode &&
+                    duplicateProduct.productBarcode === validatedData.productBarcode) {
+                    message = 'Product barcode sudah terdaftar';
+                }
+                return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json(response_1.ResponseData.error({ message }));
+            }
+        }
+        /**
+         * ===============================
+         * RECALCULATE SELL PRICE (OPTIONAL)
+         * ===============================
+         */
         const updatedPrice = validatedData.productPrice ?? product.productPrice;
         const updatedDiscount = validatedData.productDiscount ?? product.productDiscount;
         if (validatedData.productPrice !== undefined ||
@@ -33,6 +82,11 @@ const updateProduct = async (req, res) => {
                 discountPercent: Number(updatedDiscount)
             });
         }
+        /**
+         * ===============================
+         * UPDATE PRODUCT
+         * ===============================
+         */
         await product.update(validatedData);
         const response = response_1.ResponseData.default;
         response.data = { message: 'success' };
