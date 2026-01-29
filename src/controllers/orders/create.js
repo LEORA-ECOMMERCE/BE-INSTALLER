@@ -42,13 +42,26 @@ const createOrder = async (req, res) => {
                 deleted: { [sequelize_1.Op.eq]: 0 },
                 productId: { [sequelize_1.Op.in]: productIds }
             },
-            transaction: t
+            transaction: t,
+            lock: t.LOCK.UPDATE
         });
         if (products.length !== items.length) {
             await t.rollback();
             return res
                 .status(http_status_codes_1.StatusCodes.NOT_FOUND)
                 .json(response_1.ResponseData.error('salah satu produk tidak ditemukan'));
+        }
+        // CEK STOK
+        for (const item of items) {
+            const product = products.find((p) => String(p.productId) === String(item.productId));
+            if (!product)
+                continue;
+            if (product.productStock < item.quantity) {
+                await t.rollback();
+                return res
+                    .status(http_status_codes_1.StatusCodes.BAD_REQUEST)
+                    .json(response_1.ResponseData.error(`Stock produk ${product.productName} tidak mencukupi`));
+            }
         }
         /* 3 HITUNG TOTAL */
         let orderSubtotal = 0;
@@ -94,6 +107,19 @@ const createOrder = async (req, res) => {
                 totalPrice: item.totalPrice
             };
             await orderItems_1.OrderItemsModel.create(payload, { transaction: t });
+        }
+        /* 5 UPDATE STOK PRODUK */
+        for (const item of orderItemsPayload) {
+            await products_1.ProductModel.update({
+                productStock: models_1.sequelize.literal(`product_stock - ${item.quantity}`),
+                productTotalSale: models_1.sequelize.literal(`product_total_sale + ${item.quantity}`)
+            }, {
+                where: {
+                    productId: item.productId,
+                    deleted: { [sequelize_1.Op.eq]: 0 }
+                },
+                transaction: t
+            });
         }
         const orderReferenceId = `ORDER-${order.orderId}-${Date.now()}`;
         /* 6 MIDTRANS */
